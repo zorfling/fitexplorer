@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>Weight</title>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load('visualization', '1', {packages: ['corechart', 'line']});
+            google.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+
+              var data = new google.visualization.DataTable();
+              data.addColumn('datetime', 'Date');
+              data.addColumn('number', 'Weight');
+              data.addColumn('number', 'Moving Average');
+
+              data.addRows([
+            <% results.each do |elem| %>
+                [new Date(<%= elem[:timestamp] %>),  <%= elem[:weight] %>, <% if elem[:movingAverage].nil? then %><%= elem[:weight] %><% else %><%= elem[:movingAverage] %><% end %>],
+            <% end %>
+              ]);
+
+              var options = {
+                chart: {
+                  title: 'Weight'
+                },
+                width: 900,
+                height: 500,
+                curveType: 'function'
+              };
+
+              var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+              chart.draw(data, options);
+            }
+        </script>
+    </head>
+    <body>
+        <div id="chart_div"></div>
+        here tis<br />
+        <%= results.inspect %>
+<% entries.point.to_ary.each do |elem|%>
+    <% if elem.start_time_nanos / 1000000 != 1428870763035 and elem.start_time_nanos / 1000000 != 1421958651122 and elem.start_time_nanos / 1000000 != 1422064899904 and elem.start_time_nanos / 1000000 != 1422132425581 and elem.start_time_nanos / 1000000 != 1420490820535  and elem.start_time_nanos / 1000000 != 1422132425581 %>
+    [new Date(<%= elem.start_time_nanos / 1000000 %>), <%= elem.value[0].fp_val.round(2) %>],
+    <% end %>
+<% end %>
+    </body>
+</html>
