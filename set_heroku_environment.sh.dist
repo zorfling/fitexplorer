@@ -1,0 +1,1 @@
+heroku config:set CLIENT_SECRET=<your client secret> CLIENT_EMAIL=<your client email> REDIRECT_URI=<your redirect uri> CLIENT_X509_CERT_URL=<your client cert url> CLIENT_ID=<your client id> JAVASCRIPT_ORIGIN=<your javascript origin>

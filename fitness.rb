@@ -40,7 +40,27 @@ configure do
 
   file_storage = Google::APIClient::FileStorage.new(CREDENTIAL_STORE_FILE)
   if file_storage.authorization.nil?
-    client_secrets = Google::APIClient::ClientSecrets.load
+    if File.file?('client_secrets.json')
+      client_secrets = Google::APIClient::ClientSecrets.load
+    else
+      client_secrets_json = '{
+        "web":{
+          "auth_uri":"https://accounts.google.com/o/oauth2/auth",
+          "client_secret":"' + ENV['CLIENT_SECRET'] + '",
+          "token_uri":"https://accounts.google.com/o/oauth2/token",
+          "client_email":"' + ENV['CLIENT_EMAIL'] + '",
+          "redirect_uris":["' + ENV['REDIRECT_URI'] + '"],
+          "client_x509_cert_url":"' + ENV['CLIENT_X509_CERT_URL'] + '",
+          "client_id":"' + ENV['CLIENT_ID'] + '",
+          "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
+          "javascript_origins":["' + ENV['JAVASCRIPT_ORIGIN'] + '"]
+        }
+      }'
+
+      data = MultiJson.load(client_secrets_json)
+      client_secrets = Google::APIClient::ClientSecrets.new(data)
+    end
+
     client.authorization = client_secrets.to_authorization
     client.authorization.scope = [
       'https://www.googleapis.com/auth/fitness.activity.read',

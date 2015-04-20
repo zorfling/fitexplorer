@@ -38,3 +38,4 @@ build/
 client_secrets.json
 *.log
 *.rb-oauth2.json
+set_heroku_environment.sh
