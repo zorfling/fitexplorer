@@ -6,3 +6,5 @@ Uses the [Google API Ruby Client](https://github.com/google/google-api-ruby-clie
 Follow the instructions in the Calendar sample to set up an application and download the client secrets JSON (a dist version of which is included here)
 
 If you're deploying to heroku, modify the set_heroku_environment.sh with your details from the client secrets JSON
+
+A copy is deployed on Heroku at http://gfitexplorer.herokuapp.com/
