@@ -121,7 +121,7 @@ get '/' do
   # 3 = weight
   call = 3
   start = Time.new(2015, 4, 1)
-  now = Time.now
+  now = Time.now.getlocal('+10:00')
   sinceApril1 =  (start.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
   since2014 =  (Time.new(2014, 1, 1).to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
 
