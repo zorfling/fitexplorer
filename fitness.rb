@@ -36,7 +36,8 @@ configure do
 
   client = Google::APIClient.new(
     :application_name => 'Ruby Calendar sample',
-    :application_version => '1.0.0')
+    :application_version => '1.0.0'
+  )
 
   file_storage = Google::APIClient::FileStorage.new(CREDENTIAL_STORE_FILE)
   if file_storage.authorization.nil?
@@ -157,17 +158,17 @@ get '/' do
     movingAverage = nil
     dataArray.each do | item |
       if (key + 1 > halfAverage and key + 1 < dataArray.length - halfAverage) then
-          if movingAverage.nil? then
-            movingAverage = 0
-            for i in (key - halfAverage)..(key + halfAverage)
-              movingAverage += dataArray[i].value[0].fp_val.round(2)
-            end
-            movingAverage = (movingAverage / averageSize).round(2)
-          else
-            toRemove = key - (halfAverage + 1)
-            toAdd = key + halfAverage
-            movingAverage = (movingAverage - (results[key - (halfAverage + 1)][:weight] / averageSize) + (dataArray[key + halfAverage].value[0].fp_val.round(2) / averageSize)).round(2)
+        if movingAverage.nil? then
+          movingAverage = 0
+          for i in (key - halfAverage)..(key + halfAverage)
+            movingAverage += dataArray[i].value[0].fp_val.round(2)
           end
+          movingAverage = (movingAverage / averageSize).round(2)
+        else
+          toRemove = key - (halfAverage + 1)
+          toAdd = key + halfAverage
+          movingAverage = (movingAverage - (results[key - (halfAverage + 1)][:weight] / averageSize) + (dataArray[key + halfAverage].value[0].fp_val.round(2) / averageSize)).round(2)
+        end
       end
       # Check if this weight is WAAY off the moving average and omit it
       if not movingAverage.nil? then
