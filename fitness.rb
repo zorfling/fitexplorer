@@ -4,6 +4,7 @@ require 'google/api_client/client_secrets'
 require 'google/api_client/auth/file_storage'
 require 'sinatra'
 require 'logger'
+require 'date'
 
 enable :sessions
 
@@ -122,9 +123,11 @@ get '/' do
   # 3 = weight
   call = 3
   start = Time.new(2015, 4, 1)
+  oneMonth = (Date.today - 30).to_time
   now = Time.now.getlocal('+10:00')
   sinceApril1 =  (start.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
   since2014 =  (Time.new(2014, 1, 1).to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
+  since1Month =  (oneMonth.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
 
   case call
   when 1
@@ -146,7 +149,7 @@ get '/' do
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.weight:com.google.android.gms:merge_weight',
-                                  'datasetId' => since2014
+                                  'datasetId' => since1Month
                                 },
                                 :authorization => user_credentials)
     results = []
@@ -182,6 +185,26 @@ get '/' do
     end
 
     results.reject! { |item| omissions.include?(item[:timestamp]) }
+
+    annotations = {
+      '2016-01-10' => {
+        annotation: 'B',
+        annotationText: 'Here I did something'
+      }
+    }
+
+    # Add annotations
+    results.map! do |elem|
+      timestamp = elem[:timestamp]
+      normalisedDate = Time.at(timestamp / 1000).utc.localtime.to_date
+
+      if (annotations.has_key? normalisedDate.to_s) then
+        elem[:annotation] = annotations[normalisedDate.to_s][:annotation]
+        elem[:annotationText] = annotations[normalisedDate.to_s][:annotationText]
+      end
+
+      elem
+    end
 
     return [result.status, erb(:weight, { :locals => { :entries => result.data, :results => results } }) ]
   end

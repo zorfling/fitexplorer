@@ -11,11 +11,13 @@
               var data = new google.visualization.DataTable();
               data.addColumn('datetime', 'Date');
               data.addColumn('number', 'Weight');
+              data.addColumn({type:'string', role:'annotation'});
+              data.addColumn({type:'string', role:'annotationText'});
               data.addColumn('number', 'Moving Average');
 
               data.addRows([
             <% results.each do |elem| %>
-                [new Date(<%= elem[:timestamp] %>),  <%= elem[:weight] %>, <% if elem[:movingAverage].nil? then %><%= elem[:weight] %><% else %><%= elem[:movingAverage] %><% end %>],
+                [new Date(<%= elem[:timestamp] %>),  <%= elem[:weight] %>, <% if elem[:annotation].nil? then %>null<% else %>"<%= elem[:annotation] %>"<% end %>, <% if elem[:annotationText].nil? then %>null<% else %>"<%= elem[:annotationText] %>"<% end %>, <% if elem[:movingAverage].nil? then %><%= elem[:weight] %><% else %><%= elem[:movingAverage] %><% end %>],
             <% end %>
               ]);
 
