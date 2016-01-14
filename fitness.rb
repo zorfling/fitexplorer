@@ -153,7 +153,7 @@ get '/' do
     averageSize = 7 # must be odd
     halfAverage = (averageSize - 1) / 2
     dataArray = result.data.point.to_ary
-    dataArray.reject! { | item | [ 1428870763035, 1421958651122, 1422064899904, 1422132425581, 1420490820535 , 1422132425581 ].include?(item.start_time_nanos / 1000000) }
+    omissions = []
     movingAverage = nil
     dataArray.each do | item |
       if (key + 1 > halfAverage and key + 1 < dataArray.length - halfAverage) then
@@ -169,10 +169,18 @@ get '/' do
             movingAverage = (movingAverage - (results[key - (halfAverage + 1)][:weight] / averageSize) + (dataArray[key + halfAverage].value[0].fp_val.round(2) / averageSize)).round(2)
           end
       end
+      # Check if this weight is WAAY off the moving average and omit it
+      if not movingAverage.nil? then
+        if (item.value[0].fp_val.round(2) - movingAverage).abs > 2 then
+          omissions.push(item.start_time_nanos / 1000000)
+        end
+      end
       hash = { timestamp: item.start_time_nanos / 1000000, weight: item.value[0].fp_val.round(2), movingAverage: movingAverage }
       results.push(hash)
       key = key + 1
     end
+
+    results.reject! { |item| omissions.include?(item[:timestamp]) }
 
     return [result.status, erb(:weight, { :locals => { :entries => result.data, :results => results } }) ]
   end
