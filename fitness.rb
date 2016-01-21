@@ -117,6 +117,12 @@ get '/oauth2callback' do
   redirect to('/')
 end
 
+def since(theTime)
+  now = Time.now.getlocal('+10:00')
+  (theTime.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
+end
+
+
 get '/' do
   # 1 = data sources
   # 2 = heart rate
@@ -124,10 +130,13 @@ get '/' do
   call = 3
   start = Time.new(2015, 4, 1)
   oneMonth = (Date.today - 30).to_time
-  now = Time.now.getlocal('+10:00')
-  sinceApril1 =  (start.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
-  since2014 =  (Time.new(2014, 1, 1).to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
-  since1Month =  (oneMonth.to_i * 1000 * 1000000).to_s + '-' + (now.to_i * 1000 * 1000000).to_s
+  threeMonths = (Date.today - 90).to_time
+  yesterday = (Date.today - 1).to_time
+
+  sinceApril1 =  since(start)
+  since2014 =  since(Time.new(2014, 1, 1))
+  since1Month =  since(oneMonth)
+  since3Months =  since(threeMonths)
 
   case call
   when 1
@@ -149,17 +158,31 @@ get '/' do
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.weight:com.google.android.gms:merge_weight',
-                                  'datasetId' => since1Month
+                                  'datasetId' => since3Months
                                 },
                                 :authorization => user_credentials)
+    stepResult = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
+                                :parameters => {
+                                  'userId' => 'me',
+                                  'dataSourceId' => 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
+                                  'datasetId' => since3Months
+                                },
+                                :authorization => user_credentials)
+
     results = []
     key = 0
     averageSize = 7 # must be odd
     halfAverage = (averageSize - 1) / 2
     dataArray = result.data.point.to_ary
+    stepDataArray = stepResult.data.point.to_ary
     omissions = []
     movingAverage = nil
     dataArray.each do | item |
+      # actualDate = Time.at(item.start_time_nanos / 1000 / 1000000).to_date
+      # checkDate = Date.new(2016, 1, 13)
+      # if actualDate == checkDate then
+      #   puts item.inspect
+      # end
       if (key + 1 > halfAverage and key + 1 < dataArray.length - halfAverage) then
         if movingAverage.nil? then
           movingAverage = 0
@@ -170,7 +193,7 @@ get '/' do
         else
           toRemove = key - (halfAverage + 1)
           toAdd = key + halfAverage
-          movingAverage = (movingAverage - (results[key - (halfAverage + 1)][:weight] / averageSize) + (dataArray[key + halfAverage].value[0].fp_val.round(2) / averageSize)).round(2)
+          movingAverage = (movingAverage - (results[toRemove][:weight] / averageSize) + (dataArray[toAdd].value[0].fp_val.round(2) / averageSize)).round(2)
         end
       end
       # Check if this weight is WAAY off the moving average and omit it
@@ -179,18 +202,59 @@ get '/' do
           omissions.push(item.start_time_nanos / 1000000)
         end
       end
-      hash = { timestamp: item.start_time_nanos / 1000000, weight: item.value[0].fp_val.round(2), movingAverage: movingAverage }
+      hash = { timestamp: Time.at(item.start_time_nanos / 1000000).utc.localtime.to_i, weight: item.value[0].fp_val.round(2), movingAverage: movingAverage }
       results.push(hash)
       key = key + 1
     end
 
+    stepCounts = {}
+    stepDataArray.each do | item |
+      steps = item.value[0].intVal
+      normalisedDate = Time.at(item.start_time_nanos / 1000000000).utc.localtime.to_date.to_s
+      stepCounts[normalisedDate] ||= 0
+      stepCounts[normalisedDate] += steps
+    end
+
+
     results.reject! { |item| omissions.include?(item[:timestamp]) }
 
     annotations = {
-      '2016-01-10' => {
+      '2015-11-14' => {
+        annotation: 'N',
+        annotationText: 'Trip to Sunny Coast'
+      },
+      '2015-11-21' => {
+        annotation: 'G',
+        annotationText: 'Started tracking in LifeSum'
+      },
+      '2015-11-23' => {
+        annotation: 'G',
+        annotationText: 'Started hitting goals in LifeSum'
+      },
+      '2015-12-05' => {
         annotation: 'B',
-        annotationText: 'Here I did something'
-      }
+        annotationText: 'Stopped tracking in LifeSum'
+      },
+      '2015-12-25' => {
+        annotation: 'B',
+        annotationText: 'Christmas'
+      },
+      '2015-12-27' => {
+        annotation: 'G',
+        annotationText: 'Got sick'
+      },
+      '2015-12-31' => {
+        annotation: 'N',
+        annotationText: 'Got better'
+      },
+      '2016-01-04' => {
+        annotation: 'N',
+        annotationText: 'Back to work'
+      },
+      '2016-01-12' => {
+        annotation: 'B',
+        annotationText: 'Lunch with Shen (double lunch)'
+      },
     }
 
     # Add annotations
@@ -201,6 +265,10 @@ get '/' do
       if (annotations.has_key? normalisedDate.to_s) then
         elem[:annotation] = annotations[normalisedDate.to_s][:annotation]
         elem[:annotationText] = annotations[normalisedDate.to_s][:annotationText]
+      end
+
+      if (stepCounts.has_key? normalisedDate.to_s) then
+        elem[:steps] = stepCounts[normalisedDate.to_s]
       end
 
       elem
