@@ -255,6 +255,10 @@ get '/' do
         annotation: 'B',
         annotationText: 'Lunch with Shen (double lunch)'
       },
+      '2016-01-27' => {
+        annotation: 'B',
+        annotationText: 'Back to Prentice'
+      },
     }
 
     # Add annotations
