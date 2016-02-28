@@ -128,6 +128,7 @@ get '/' do
   # 2 = heart rate
   # 3 = weight
   call = 3
+  now = Time.now.getlocal('+10:00')
   start = Time.new(2015, 4, 1)
   oneMonth = (Date.today - 30).to_time
   threeMonths = (Date.today - 90).to_time
@@ -169,7 +170,9 @@ get '/' do
                                 },
                                 :authorization => user_credentials)
 
-    results = []
+    # Set up date list ahead of time to avoid missing days due to no weight recorded
+    results = generateDays(threeMonths, now)
+    weight_results = []
     key = 0
     averageSize = 7 # must be odd
     halfAverage = (averageSize - 1) / 2
@@ -193,7 +196,7 @@ get '/' do
         else
           toRemove = key - (halfAverage + 1)
           toAdd = key + halfAverage
-          movingAverage = (movingAverage - (results[toRemove][:weight] / averageSize) + (dataArray[toAdd].value[0].fp_val.round(2) / averageSize)).round(2)
+          movingAverage = (movingAverage - (weight_results[toRemove][:weight] / averageSize) + (dataArray[toAdd].value[0].fp_val.round(2) / averageSize)).round(2)
         end
       end
       # Check if this weight is WAAY off the moving average and omit it
@@ -203,7 +206,7 @@ get '/' do
         end
       end
       hash = { timestamp: Time.at(item.start_time_nanos / 1000000).utc.localtime.to_i, weight: item.value[0].fp_val.round(2), movingAverage: movingAverage }
-      results.push(hash)
+      weight_results.push(hash)
       key = key + 1
     end
 
@@ -285,10 +288,21 @@ get '/' do
       },
     }
 
+    # Add weights
+    normalisedWeights = {}
+    weight_results.map! do |elem|
+      timestamp = elem[:timestamp]
+      normalisedDate = Time.at(timestamp / 1000).utc.localtime.to_date
+      normalisedWeights[normalisedDate.to_s] = elem
+    end
+
     # Add annotations
+    previous_weight = 0
+    previous_average = 0
     results.map! do |elem|
       timestamp = elem[:timestamp]
       normalisedDate = Time.at(timestamp / 1000).utc.localtime.to_date
+      puts normalisedDate
 
       if (annotations.has_key? normalisedDate.to_s) then
         elem[:annotation] = annotations[normalisedDate.to_s][:annotation]
@@ -299,9 +313,33 @@ get '/' do
         elem[:steps] = stepCounts[normalisedDate.to_s]
       end
 
+      if (normalisedWeights.has_key? normalisedDate.to_s) then
+        elem[:weight] = normalisedWeights[normalisedDate.to_s][:weight]
+        elem[:movingAverage] = normalisedWeights[normalisedDate.to_s][:movingAverage]
+        previous_weight = elem[:weight]
+        previous_average = elem[:movingAverage]
+      else
+        # makes for a neater graph if we just fudge missing values to yesterdays
+        elem[:weight] = previous_weight
+        elem[:movingAverage] = previous_average
+      end
+
       elem
     end
 
+
     return [result.status, erb(:weight, { :locals => { :entries => result.data, :results => results } }) ]
   end
+end
+
+def generateDays(from, to)
+  results = []
+  current = from.to_date
+  to_timestamp = to.to_date.to_time.to_i
+  while current.to_time.to_i <= to_timestamp do
+    hash = { timestamp: current.to_time.utc.localtime.to_i * 1000 }
+    results.push(hash)
+    current = current + 1
+  end
+  results
 end
