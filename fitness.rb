@@ -259,6 +259,30 @@ get '/' do
         annotation: 'B',
         annotationText: 'Back to Prentice'
       },
+      '2016-01-29' => {
+        annotation: 'N',
+        annotationText: 'Becky starts childcare'
+      },
+      '2016-01-31' => {
+        annotation: 'G',
+        annotationText: 'Bouncy Castle'
+      },
+      '2016-02-05' => {
+        annotation: 'B',
+        annotationText: 'Beers and start side work'
+      },
+      '2016-02-14' => {
+        annotation: 'B',
+        annotationText: 'Up the coast'
+      },
+      '2016-02-20' => {
+        annotation: 'B',
+        annotationText: 'Famageddon begins'
+      },
+      '2016-02-27' => {
+        annotation: 'B',
+        annotationText: 'Famageddon'
+      },
     }
 
     # Add annotations
