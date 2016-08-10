@@ -42,7 +42,7 @@
               var data = google.visualization.arrayToDataTable([
                 ['Date', 'Weight', {type:'string', role:'annotation'}, {type:'string', role:'annotationText'}, 'Average', 'Steps'],
             <% results.each do |elem| %>
-                [new Date(<%= elem[:timestamp] %>),  <%= elem[:weight] %>, <% if elem[:annotation].nil? then %>null<% else %>"<%= elem[:annotation] %>"<% end %>, <% if elem[:annotationText].nil? then %>null<% else %>"<%= elem[:annotationText] %>"<% end %>, <% if elem[:movingAverage].nil? then %><%= elem[:weight] %><% else %><%= elem[:movingAverage] %><% end %>, <% if elem[:steps].nil? then %>null<% else %><%= elem[:steps] %><% end %>],
+                [new Date(<%= elem[:timestamp] %>), <% if elem[:weight].nil? or elem[:weight] == 0 then %>null<% else %><%= elem[:weight] %><% end %>, <% if elem[:annotation].nil? then %>null<% else %>"<%= elem[:annotation] %>"<% end %>, <% if elem[:annotationText].nil? then %>null<% else %>"<%= elem[:annotationText] %>"<% end %>, <% if elem[:movingAverage].nil? or elem[:movingAverage] == 0 then %><% if elem[:weight].nil? or elem[:weight] == 0 then %>null<% else %><%= elem[:weight] %><% end %><% else %><%= elem[:movingAverage] %><% end %>, <% if elem[:steps].nil? then %>null<% else %><%= elem[:steps] %><% end %>],
             <% end %>
               ]);
 
