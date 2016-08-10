@@ -286,6 +286,42 @@ get '/' do
         annotation: 'B',
         annotationText: 'Famageddon'
       },
+      '2016-03-07' => {
+        annotation: 'N',
+        annotationText: 'Back to Rock St'
+      },
+      '2016-03-25' => {
+        annotation: 'N',
+        annotationText: 'Holidays'
+      },
+      '2016-03-27' => {
+        annotation: 'B',
+        annotationText: 'Easter'
+      },
+      '2016-04-04' => {
+        annotation: 'N',
+        annotationText: 'Back to work'
+      },
+      '2016-05-13' => {
+        annotation: 'B',
+        annotationText: 'Scales broke'
+      },
+      '2016-06-17' => {
+        annotation: 'G',
+        annotationText: 'Got Withings'
+      },
+      '2016-07-12' => {
+        annotation: 'B',
+        annotationText: 'My birthday'
+      },
+      '2016-07-16' => {
+        annotation: 'N',
+        annotationText: 'Finish side work'
+      },
+      '2016-08-01' => {
+        annotation: 'G',
+        annotationText: 'Focus on step goal'
+      }
     }
 
     # Add weights
