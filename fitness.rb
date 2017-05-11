@@ -321,6 +321,18 @@ get '/' do
       '2016-08-01' => {
         annotation: 'G',
         annotationText: 'Focus on step goal'
+      },
+      '2017-04-16' => {
+        annotation: 'B',
+        annotationText: 'Easter'
+      },
+      '2017-04-18' => {
+        annotation: 'G',
+        annotationText: 'Back to Prentice'
+      },
+      '2017-05-08' => {
+        annotation: 'G',
+        annotationText: 'Standing desk!'
       }
     }
 
