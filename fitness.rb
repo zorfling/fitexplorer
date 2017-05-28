@@ -333,6 +333,14 @@ get '/' do
       '2017-05-08' => {
         annotation: 'G',
         annotationText: 'Standing desk!'
+      },
+      '2017-05-15' => {
+        annotation: 'B',
+        annotationText: 'Shen week start'
+      },
+      '2017-05-20' => {
+        annotation: 'G',
+        annotationText: 'Shen week finish'
       }
     }
 
