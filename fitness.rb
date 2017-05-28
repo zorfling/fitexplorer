@@ -132,14 +132,12 @@ get '/' do
   start = Time.new(2015, 4, 1)
   oneMonth = (Date.today - 30).to_time
   threeMonths = (Date.today - 90).to_time
-  sixMonths = (Date.today - 180).to_time
   yesterday = (Date.today - 1).to_time
 
   sinceApril1 =  since(start)
   since2014 =  since(Time.new(2014, 1, 1))
   since1Month =  since(oneMonth)
   since3Months =  since(threeMonths)
-  since6Months =  since(sixMonths)
 
   case call
   when 1
@@ -161,19 +159,19 @@ get '/' do
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.weight:com.google.android.gms:merge_weight',
-                                  'datasetId' => since6Months
+                                  'datasetId' => since3Months
                                 },
                                 :authorization => user_credentials)
     stepResult = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
-                                  'datasetId' => since6Months
+                                  'datasetId' => since3Months
                                 },
                                 :authorization => user_credentials)
 
     # Set up date list ahead of time to avoid missing days due to no weight recorded
-    results = generateDays(sixMonths, now)
+    results = generateDays(threeMonths, now)
     weight_results = []
     key = 0
     averageSize = 7 # must be odd
