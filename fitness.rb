@@ -322,6 +322,10 @@ get '/' do
         annotation: 'G',
         annotationText: 'Focus on step goal'
       },
+      '2017-04-03' => {
+        annotation: 'G',
+        annotationText: 'Sick'
+      },
       '2017-04-16' => {
         annotation: 'B',
         annotationText: 'Easter'
