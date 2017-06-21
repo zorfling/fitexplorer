@@ -345,6 +345,10 @@ get '/' do
       '2017-05-20' => {
         annotation: 'G',
         annotationText: 'Shen week finish'
+      },
+      '2017-06-04' => {
+        annotation: 'G',
+        annotationText: 'Sick'
       }
     }
 
