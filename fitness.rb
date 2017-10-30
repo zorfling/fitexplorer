@@ -349,6 +349,14 @@ get '/' do
       '2017-06-04' => {
         annotation: 'G',
         annotationText: 'Sick'
+      },
+      '2017-10-24' => {
+        annotation: 'G',
+        annotationText: 'Start Processed Free Days'
+      },
+      '2017-10-29' => {
+        annotation: 'B',
+        annotationText: 'Beckys birthday'
       }
     }
 
