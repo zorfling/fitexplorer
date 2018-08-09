@@ -161,19 +161,19 @@ get '/' do
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.weight:com.google.android.gms:merge_weight',
-                                  'datasetId' => sinceApril1
+                                  'datasetId' => since6Months
                                 },
                                 :authorization => user_credentials)
     stepResult = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
-                                  'datasetId' => sinceApril1
+                                  'datasetId' => since6Months
                                 },
                                 :authorization => user_credentials)
 
     # Set up date list ahead of time to avoid missing days due to no weight recorded
-    results = generateDays(start, now)
+    results = generateDays(sixMonths, now)
     weight_results = []
     key = 0
     averageSize = 7 # must be odd
