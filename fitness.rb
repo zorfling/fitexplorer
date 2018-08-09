@@ -356,7 +356,35 @@ get '/' do
       },
       '2017-10-29' => {
         annotation: 'B',
-        annotationText: 'Beckys birthday'
+        annotationText: 'Becky\'s birthday'
+      },
+      '2018-01-02' => {
+        annotation: '?',
+        annotationText: 'UQ Extension Begins'
+      },
+      '2018-03-29' => {
+        annotation: '?',
+        annotationText: 'Last day at UQ'
+      },
+      '2018-04-30' => {
+        annotation: 'B',
+        annotationText: 'Beebs and Becky fly out'
+      },
+      '2018-05-10' => {
+        annotation: 'B',
+        annotationText: 'MBP in Apple Store'
+      },
+      '2018-05-24' => {
+        annotation: 'G',
+        annotationText: 'MBP back from Apple Store'
+      },
+      '2018-07-01' => {
+        annotation: 'G',
+        annotationText: 'Beebs and Becky get back'
+      },
+      '2018-07-23' => {
+        annotation: 'B',
+        annotationText: 'First day Equifax'
       }
     }
 
