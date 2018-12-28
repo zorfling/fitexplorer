@@ -387,6 +387,18 @@ get '/' do
       '2018-07-23' => {
         annotation: 'B',
         annotationText: 'First day Equifax'
+      },
+      '2018-12-14' => {
+        annotation: 'G',
+        annotationText: 'Holidays from Equifax'
+      },
+      '2018-10-03' => {
+        annotation: 'G',
+        annotationText: 'Start Noom'
+      },
+      '2018-12-25' => {
+        annotation: 'B',
+        annotationText: 'Christmas'
       }
     }
 
@@ -404,7 +416,7 @@ get '/' do
     results.map! do |elem|
       timestamp = elem[:timestamp]
       normalisedDate = Time.at(timestamp / 1000).utc.localtime.to_date
-      puts normalisedDate
+      # puts normalisedDate
 
       if (annotations.has_key? normalisedDate.to_s) then
         elem[:annotation] = annotations[normalisedDate.to_s][:annotation]

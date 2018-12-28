@@ -1,0 +1,8 @@
+web:
+  image: erikap/ruby-sinatra:ruby-2.1-latest
+  ports:
+    - '4567:4567'
+  volumes:
+    - ./:/usr/src/app
+  working_dir: /usr/src/app
+  command: sh -c "bundle && bundle exec ruby fitness.rb"

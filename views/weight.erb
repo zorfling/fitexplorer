@@ -6,7 +6,6 @@
 
 <body>
   <div id="chart_div"></div>
-  here tis
   <br />
   <!--
         <%= results.inspect %>
@@ -17,50 +16,40 @@
 <% end %>
 -->
 </body>
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+
+<script src="/firebase.js"></script>
+
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
   google.load('visualization', '1', { packages: ['corechart', 'line'] });
   google.setOnLoadCallback(drawChart);
 
-  /*
-           function drawVisualization() {
-// Some raw data (not necessarily accurate)
-
-var data = google.visualization.arrayToDataTable([
-['Date', 'Weight', {type:'string', role:'annotation'}, {type:'string', role:'annotationText'}, 'Moving Average', 'Average'],
-[new Date(1445546451113),  121.1, null, null, 121.1, 10000],
-[new Date(1445645700000),  121.2, null, null, 121.2, 7000],
-[new Date(1445720400000),  120.8, 'A', 'Hello', 120.8, 9666],
-[new Date(1445804937256),  120.3, null, null, 121.44, 3444],
-[new Date(1446149700000),  121.9, null, null, 121.63, 5000]
-]);
-
-var options = {
-title : 'Monthly Coffee Production by Country',
-vAxis: {0 : {title: 'Cups'}, 1: {title: 'Cuppos'}},
-hAxis: {title: 'Month'},
-seriesType: 'line',
-series: {
-0: {type: 'line', axis: 'Weight'},
-1: {type: 'line', axis: 'Weight'},
-2: {type: 'bars', axis: 'Steps'}
-},
-axes: {
-y: {
-Weight: { label: 'Weight' },
-Steps: { label: 'Steps' }
-}
-}
-}; */
-
   function drawChart() {
 
-    var data = google.visualization.arrayToDataTable([
-      ['Date', 'Weight', { type: 'string', role: 'annotation' }, { type: 'string', role: 'annotationText' }, 'Average', 'Steps'],
-            <% results.each do | elem | %>
-      [new Date(<%= elem[:timestamp] %>), <% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %>, <% if elem[:annotation].nil? then %> null <% else %> "<%= elem[:annotation] %>" <% end %>, <% if elem[:annotationText].nil? then %> null <% else %> "<%= elem[:annotationText] %>" <% end %>, <% if elem[:movingAverage].nil? or elem[:movingAverage] == 0 then %><% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %><% else %><%= elem[:movingAverage] %><% end %>, <% if elem[:steps].nil? then %> null <% else %><%= elem[:steps] %><% end %>],
-            <% end %>
-              ]);
+    var dataArray = [
+      [
+        'Date',
+        'Weight',
+        { type: 'string', role: 'annotation' },
+        { type: 'string', role: 'annotationText' },
+        'Average',
+        'Steps'
+      ]
+    ];
+    <% results.each do | elem | %>
+      var theAnnotation = annotations.find(function(annotation) { return annotation.date.getTime() === <%= elem[:timestamp] %>});
+      dataArray.push(
+      [
+        new Date(<%= elem[:timestamp] %>),
+        <% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %>,
+        theAnnotation ? theAnnotation.annotation : null,
+        theAnnotation ? theAnnotation.annotationText: null,
+        <% if elem[:movingAverage].nil? or elem[:movingAverage] == 0 then %><% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %><% else %><%= elem[:movingAverage] %><% end %>,
+        <% if elem[:steps].nil? then %> null <% else %><%= elem[:steps] %><% end %>
+      ]);
+    <% end %>
+    var data = google.visualization.arrayToDataTable(dataArray);
 
     var options = {
       title: 'Weight and steps',
