@@ -36,5 +36,3 @@ db.collection('annotations')
   .catch(function(error) {
     console.log('Error getting documents: ', error);
   });
-
-console.log(annotations);
