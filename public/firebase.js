@@ -16,23 +16,3 @@ var db = firebase.firestore();
 db.settings({
   timestampsInSnapshots: true
 });
-
-var annotations = [];
-
-db.collection('annotations')
-  .orderBy('date')
-  .get()
-  .then(function(querySnapshot) {
-    querySnapshot.forEach(function(doc) {
-      var data = doc.data();
-      var theDate = new Date((data.date.seconds + 10 * 60 * 60) * 1000);
-      annotations.push({
-        date: theDate,
-        annotation: data.annotation,
-        annotationText: data.annotationText
-      });
-    });
-  })
-  .catch(function(error) {
-    console.log('Error getting documents: ', error);
-  });

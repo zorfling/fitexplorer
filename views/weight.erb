@@ -27,54 +27,73 @@
   google.setOnLoadCallback(drawChart);
 
   function drawChart() {
+    var annotations = [];
 
-    var dataArray = [
-      [
-        'Date',
-        'Weight',
-        { type: 'string', role: 'annotation' },
-        { type: 'string', role: 'annotationText' },
-        'Average',
-        'Steps'
-      ]
-    ];
-    <% results.each do | elem | %>
-      var theAnnotation = annotations.find(function(annotation) { return annotation.date.getTime() === <%= elem[:timestamp] %>});
-      dataArray.push(
-      [
-        new Date(<%= elem[:timestamp] %>),
-        <% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %>,
-        theAnnotation ? theAnnotation.annotation : null,
-        theAnnotation ? theAnnotation.annotationText: null,
-        <% if elem[:movingAverage].nil? or elem[:movingAverage] == 0 then %><% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %><% else %><%= elem[:movingAverage] %><% end %>,
-        <% if elem[:steps].nil? then %> null <% else %><%= elem[:steps] %><% end %>
-      ]);
-    <% end %>
-    var data = google.visualization.arrayToDataTable(dataArray);
+    db.collection('annotations')
+      .orderBy('date')
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          var data = doc.data();
+          var theDate = new Date((data.date.seconds + 10 * 60 * 60) * 1000);
+          annotations.push({
+            date: theDate,
+            annotation: data.annotation,
+            annotationText: data.annotationText
+          });
+        });
+        var dataArray = [
+          [
+            'Date',
+            'Weight',
+            { type: 'string', role: 'annotation' },
+            { type: 'string', role: 'annotationText' },
+            'Average',
+            'Steps'
+          ]
+        ];
+        <% results.each do | elem | %>
+          var theAnnotation = annotations.find(function(annotation) { return annotation.date.getTime() === <%= elem[:timestamp] %>});
+          dataArray.push(
+          [
+            new Date(<%= elem[:timestamp] %>),
+            <% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %>,
+            theAnnotation ? theAnnotation.annotation : null,
+            theAnnotation ? theAnnotation.annotationText: null,
+            <% if elem[:movingAverage].nil? or elem[:movingAverage] == 0 then %><% if elem[:weight].nil? or elem[:weight] == 0 then %> null <% else %><%= elem[:weight] %><% end %><% else %><%= elem[:movingAverage] %><% end %>,
+            <% if elem[:steps].nil? then %> null <% else %><%= elem[:steps] %><% end %>
+          ]);
+        <% end %>
+        var data = google.visualization.arrayToDataTable(dataArray);
 
-    var options = {
-      title: 'Weight and steps',
-      vAxes: [{ title: 'Kg', viewWindowMode: 'pretty' }, { title: 'Steps', viewWindowMode: 'pretty' }],
-      hAxis: { title: 'Month' },
-      seriesType: 'line',
-      series: {
-        2: { type: 'bars', targetAxisIndex: 1 }
-      },
-      axes: {
-        y: {
-          Weight: { label: 'Weight', viewWindowMode: 'pretty' },
-          Steps: { label: 'Steps', viewWindowMode: 'pretty' }
-        }
-      },
-      width: 900,
-      height: 500,
-      curveType: 'function'
-    };
+        var options = {
+          title: 'Weight and steps',
+          vAxes: [{ title: 'Kg', viewWindowMode: 'pretty' }, { title: 'Steps', viewWindowMode: 'pretty' }],
+          hAxis: { title: 'Month' },
+          seriesType: 'line',
+          series: {
+            2: { type: 'bars', targetAxisIndex: 1 }
+          },
+          axes: {
+            y: {
+              Weight: { label: 'Weight', viewWindowMode: 'pretty' },
+              Steps: { label: 'Steps', viewWindowMode: 'pretty' }
+            }
+          },
+          width: 900,
+          height: 500,
+          curveType: 'function'
+        };
 
-    var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
 
-    chart.draw(data, options);
+        chart.draw(data, options);
+      })
+      .catch(function(error) {
+        console.log('Error getting documents: ', error);
+      });
   }
+
 </script>
 
 </html>
