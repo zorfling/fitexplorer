@@ -129,17 +129,12 @@ get '/' do
   # 3 = weight
   call = 3
   now = Time.now.getlocal('+10:00')
-  start = Time.new(2015, 4, 1)
-  oneMonth = (Date.today - 30).to_time
-  threeMonths = (Date.today - 90).to_time
+  # start = Time.new(2015, 4, 1)
+  # oneMonth = (Date.today - 30).to_time
+  # threeMonths = (Date.today - 90).to_time
   sixMonths = (Date.today - 180).to_time
-  yesterday = (Date.today - 1).to_time
-
-  sinceApril1 =  since(start)
-  since2014 =  since(Time.new(2014, 1, 1))
-  since1Month =  since(oneMonth)
-  since3Months =  since(threeMonths)
-  since6Months =  since(sixMonths)
+  twelveMonths = (Date.today - 365).to_time
+  # yesterday = (Date.today - 1).to_time
 
   case call
   when 1
@@ -157,23 +152,25 @@ get '/' do
                                 :authorization => user_credentials)
     return [result.status, {'Content-Type' => 'application/json'}, erb(:index, { :locals => { :resultJson => result.data.to_json } }) ]
   when 3
+    startDate = sixMonths
+    datasetId = since(startDate)
     result = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.weight:com.google.android.gms:merge_weight',
-                                  'datasetId' => since6Months
+                                  'datasetId' => datasetId
                                 },
                                 :authorization => user_credentials)
     stepResult = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
                                   'userId' => 'me',
                                   'dataSourceId' => 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
-                                  'datasetId' => since6Months
+                                  'datasetId' => datasetId
                                 },
                                 :authorization => user_credentials)
 
     # Set up date list ahead of time to avoid missing days due to no weight recorded
-    results = generateDays(sixMonths, now)
+    results = generateDays(startDate, now)
     weight_results = []
     key = 0
     averageSize = 7 # must be odd
@@ -442,7 +439,7 @@ get '/' do
     end
 
 
-    return [result.status, erb(:weight, { :locals => { :entries => result.data, :results => results } }) ]
+    return [result.status, erb(:weight, { :locals => { :entries => result.data, :results => results, :startDate => startDate } }) ]
   end
 end
 
