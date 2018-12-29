@@ -1,5 +1,5 @@
 web:
-  image: erikap/ruby-sinatra:ruby-2.1-latest
+  image: erikap/ruby-sinatra:ruby2.2-latest
   ports:
     - '4567:4567'
   volumes:
