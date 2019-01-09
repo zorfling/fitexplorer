@@ -131,7 +131,7 @@ get '/' do
   now = Time.now.getlocal('+10:00')
   # start = Time.new(2015, 4, 1)
   # oneMonth = (Date.today - 30).to_time
-  # threeMonths = (Date.today - 90).to_time
+  threeMonths = (Date.today - 90).to_time
   sixMonths = (Date.today - 180).to_time
   twelveMonths = (Date.today - 365).to_time
   # yesterday = (Date.today - 1).to_time
@@ -152,7 +152,7 @@ get '/' do
                                 :authorization => user_credentials)
     return [result.status, {'Content-Type' => 'application/json'}, erb(:index, { :locals => { :resultJson => result.data.to_json } }) ]
   when 3
-    startDate = sixMonths
+    startDate = threeMonths
     datasetId = since(startDate)
     result = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
