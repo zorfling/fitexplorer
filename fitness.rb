@@ -152,7 +152,7 @@ get '/' do
                                 :authorization => user_credentials)
     return [result.status, {'Content-Type' => 'application/json'}, erb(:index, { :locals => { :resultJson => result.data.to_json } }) ]
   when 3
-    startDate = sixMonths
+    startDate = threeMonths
     datasetId = since(startDate)
     result = api_client.execute(:api_method => fitness_api.users.data_sources.datasets.get,
                                 :parameters => {
